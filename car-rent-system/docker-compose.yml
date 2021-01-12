@@ -1,0 +1,36 @@
+version: '3.4'
+services:
+  db:
+    image: mysql:8.0.11    
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: wesley
+      MYSQL_USER: root
+      MYSQL_PASSWORD: wesley
+      MYSQL_DATABASE: car_system
+    ports:
+      - "3306:3306"
+    networks:
+      - car-system-network
+  docker-car-system-to-aws-with-java:
+    image: docker-car-system-to-aws-with-java
+    restart: always
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    working_dir: /app
+    environment:
+      TZ: America/Sao_Paulo    
+    ports:
+      - "8080:8080"
+    command: mvn spring-boot:run
+    links:
+      - db
+    depends_on:
+      - db
+    networks:
+      - car-system-network  
+networks:
+    car-system-network:
+        driver: bridge
